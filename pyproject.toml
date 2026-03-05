@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swarmesh"
+version = "0.1.0"
+description = "Agent-to-Agent Payment Protocol & Task Marketplace on Solana"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "SwarMesh Contributors"}]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Distributed Computing",
+    "Framework :: AsyncIO",
+]
+keywords = ["agents", "solana", "payments", "mesh", "marketplace", "autonomous"]
+dependencies = [
+    "solana>=0.34.0",
+    "solders>=0.21.0",
+    "base58>=2.1.0",
+    "pynacl>=1.5.0",
+    "aiohttp>=3.9.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+
+[project.urls]
+Homepage = "https://github.com/topdrift/swarmesh"
+Repository = "https://github.com/topdrift/swarmesh"
+Issues = "https://github.com/topdrift/swarmesh/issues"
+
+[project.scripts]
+swarmesh-node = "swarmesh.node:main_sync"
+swarmesh-agents = "swarmesh.agents.runner:main_sync"
+
+[tool.setuptools.packages.find]
+include = ["swarmesh*"]
+exclude = ["tests*"]
