@@ -77,6 +77,11 @@ CATEGORY_SKILL_MAP = {
     "ip": "ip-lookup",
     "email": "email-verify",
     "image": "image-analyze",
+    "github": "github-lookup",
+    "youtube": "youtube-lookup",
+    "translate": "translate",
+    "portscan": "port-scan",
+    "betting": "betting-odds",
     "other": "text-process",
 }
 

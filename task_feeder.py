@@ -281,6 +281,71 @@ TASK_TEMPLATES = [
         "bounty": "0.0005",
         "skill": "image-analyze",
     },
+    # --- GitHub Intel Tasks ---
+    {
+        "category": "github",
+        "description": "Analyze the repository A-tndn/swarmesh on GitHub — get stars, forks, languages, contributors, and recent commits.",
+        "bounty": "0.001",
+        "skill": "github-lookup",
+    },
+    {
+        "category": "github",
+        "description": "Look up GitHub user torvalds — get profile info, popular repos, and contribution stats.",
+        "bounty": "0.0005",
+        "skill": "github-lookup",
+    },
+    # --- YouTube Metadata Tasks ---
+    {
+        "category": "youtube",
+        "description": "Get metadata for this YouTube video: https://www.youtube.com/watch?v=dQw4w9WgXcQ — title, views, duration, channel, likes.",
+        "bounty": "0.001",
+        "skill": "youtube-lookup",
+    },
+    {
+        "category": "youtube",
+        "description": "Extract metadata from https://www.youtube.com/watch?v=jNQXAC9IVRw — get video details, view count, tags, and thumbnail.",
+        "bounty": "0.0005",
+        "skill": "youtube-lookup",
+    },
+    # --- Translation Tasks ---
+    {
+        "category": "translate",
+        "description": "Translate 'Hello, welcome to the decentralized agent mesh. The future is autonomous.' to Spanish.",
+        "bounty": "0.0005",
+        "skill": "translate",
+    },
+    {
+        "category": "translate",
+        "description": "Translate 'Blockchain technology enables trustless coordination between autonomous agents' to French, German, and Japanese.",
+        "bounty": "0.001",
+        "skill": "translate",
+    },
+    # --- Port Scan Tasks ---
+    {
+        "category": "portscan",
+        "description": "Scan swarmesh.xyz for open ports — check common ports (22, 80, 443, 3000, 7770, 8080) with banner grabbing.",
+        "bounty": "0.001",
+        "skill": "port-scan",
+    },
+    {
+        "category": "portscan",
+        "description": "Quick port scan of 1.1.1.1 — check for open services on common ports.",
+        "bounty": "0.0005",
+        "skill": "port-scan",
+    },
+    # --- Betting Intel Tasks ---
+    {
+        "category": "betting",
+        "description": "Full platform recon on brownexch — scan sports events, casino games, and available tables.",
+        "bounty": "0.001",
+        "skill": "betting-odds",
+    },
+    {
+        "category": "betting",
+        "description": "Get list of available casino games on 11xplay. Check for live tables and active games.",
+        "bounty": "0.001",
+        "skill": "betting-odds",
+    },
 ]
 
 # How many tasks to post per cycle
@@ -360,3 +425,5 @@ async def run_feeder():
 
 if __name__ == "__main__":
     asyncio.run(run_feeder())
+
+# This won't work as append, need to insert before TASKS_PER_CYCLE line
