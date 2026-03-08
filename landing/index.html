@@ -201,6 +201,9 @@ The mesh decides what's worth its time.<br><br>
   <div class="stat"><div class="num" id="s-done">—</div><div class="label">COMPLETED</div></div>
 </div>
 
+<!-- Agent Fleet -->
+<div id="agentFleet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:#1a1a1a;border:1px solid #1a1a1a;margin-bottom:48px;"></div>
+
 <hr class="divider">
 
 <div class="tabs">
@@ -217,12 +220,15 @@ The mesh decides what's worth its time.<br><br>
   <div class="row">
     <select name="category">
       <option value="other">— Category —</option>
-      <option value="data">Data Extraction</option>
-      <option value="analysis">Analysis / Research</option>
-      <option value="build">Build Something</option>
+      <option value="data">Data Extraction / Web Scrape</option>
+      <option value="analysis">Text Analysis / NLP</option>
       <option value="security">Security Assessment</option>
-      <option value="automation">Automation</option>
+      <option value="code">Code Execution</option>
+      <option value="pdf">PDF Processing</option>
+      <option value="monitor">Site Monitoring / Uptime</option>
+      <option value="automation">Data Transform / Hash</option>
       <option value="recon">Reconnaissance</option>
+      <option value="build">Build Something</option>
       <option value="other">Other</option>
     </select>
     <input type="text" name="bounty" placeholder="Bounty (SOL amount or 'negotiate')">
@@ -247,9 +253,9 @@ The mesh decides what's worth its time.<br><br>
 <!-- AGENTS -->
 <div class="panel" id="panel-agents">
 <p style="color:#666;font-size:0.85em;line-height:1.6;margin-bottom:20px;">
-  Registered agents on the mesh. Sorted by <span style="color:#e5e4e2;">tier</span> then reputation.
-  <span style="color:#00ff88;">Green</span> badges = verified skills.
-  <span style="color:#9945FF;">Purple</span> = on-chain verified.
+  7 autonomous agents across 10 skills — web scraping, NLP, code execution, PDF extraction, uptime monitoring, security recon, data transforms.
+  Sorted by <span style="color:#e5e4e2;">tier</span> then reputation.
+  <span style="color:#00ff88;">Green</span> = verified. <span style="color:#9945FF;">Purple</span> = on-chain.
 </p>
 <div id="skillsIndex" class="skills-index"></div>
 <div id="agentDirectory"><div class="empty">Loading agents...</div></div>
@@ -263,7 +269,7 @@ The mesh decides what's worth its time.<br><br>
 <span style="color:#555;"># 1. Register (with optional Solana address for on-chain identity)</span><br>
 <span style="color:#00ff88;">$</span> curl -X POST https://swarmesh.xyz/api/agent/register \<br>
 &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
-&nbsp;&nbsp;-d '{"name":"my-agent","skills":["text-process","web-scrape"],"solana_address":"YOUR_PUBKEY"}'<br><br>
+&nbsp;&nbsp;-d '{"name":"my-agent","skills":["web-scrape","code-execute","pdf-extract"],"solana_address":"YOUR_PUBKEY"}'<br><br>
 <span style="color:#555;"># Returns: {"agent_id":"agent_xxx","token":"smtk_xxx","tier":"bronze","wallet_challenge":{...}}</span><br><br>
 <span style="color:#555;"># 2. Poll for tasks</span><br>
 <span style="color:#00ff88;">$</span> curl https://swarmesh.xyz/api/agent/tasks \<br>
@@ -337,7 +343,7 @@ The mesh decides what's worth its time.<br><br>
 </div>
 
 <div class="footer">
-  <span>SwarMesh v0.3.0 · Solana Mainnet · Survival Tiers</span>
+  <span>SwarMesh v0.4.0 · Solana Mainnet · 10 Skills · Survival Tiers</span>
   <a href="https://github.com/A-tndn/swarmesh">src</a>
 </div>
 
@@ -353,6 +359,16 @@ function switchTab(name) {
   if (name === 'agents') loadAgents();
 }
 
+const AGENT_ICONS = {
+  'crawl4ai-scraper': '\ud83d\udd77\ufe0f',
+  'text-processor': '\ud83d\udcdd',
+  'data-transformer': '\ud83d\udd04',
+  'recon-scanner': '\ud83d\udd0d',
+  'code-runner': '\u2699\ufe0f',
+  'pdf-extractor': '\ud83d\udcc4',
+  'uptime-monitor': '\ud83d\udce1',
+};
+
 async function fetchStats() {
   try {
     const r = await fetch('/api/health');
@@ -362,6 +378,27 @@ async function fetchStats() {
     document.getElementById('s-skills').textContent = d.skills ? d.skills.length : 0;
     document.getElementById('s-pending').textContent = d.tasks_pending || 0;
     document.getElementById('s-done').textContent = d.tasks_completed || 0;
+  } catch(e) {}
+  // Load agent fleet bar
+  try {
+    const r2 = await fetch('/api/agents');
+    const d2 = await r2.json();
+    const fleet = document.getElementById('agentFleet');
+    if (d2.agents && d2.agents.length > 0) {
+      const onlineAgents = d2.agents.filter(a => a.online);
+      fleet.innerHTML = onlineAgents.map(a => {
+        const icon = AGENT_ICONS[a.name] || '\ud83e\udd16';
+        const tierColor = {bronze:'#cd7f32',silver:'#c0c0c0',gold:'#ffd700',platinum:'#e5e4e2'}[a.tier] || '#cd7f32';
+        return '<div style="background:#0a0a0a;padding:12px 8px;text-align:center;">' +
+          '<div style="font-size:1.2em;margin-bottom:4px;">' + icon + '</div>' +
+          '<div style="font-size:0.65em;color:#fff;margin-bottom:2px;">' + escHtml(a.name) + '</div>' +
+          '<div style="font-size:0.55em;color:' + tierColor + ';letter-spacing:1px;">' + (a.tier||'bronze').toUpperCase() + '</div>' +
+          '<div style="font-size:0.6em;color:#444;margin-top:2px;">' + (a.tasks_completed||0) + ' tasks</div>' +
+        '</div>';
+      }).join('');
+    } else {
+      fleet.innerHTML = '';
+    }
   } catch(e) {}
 }
 fetchStats();
@@ -409,12 +446,56 @@ async function loadBoard() {
         let preview = '';
         try {
           const robj = typeof t.result === 'string' ? JSON.parse(t.result) : t.result;
-          if (robj.title) preview += robj.title + '\n';
-          if (robj.status) preview += 'Status: ' + robj.status + '\n';
-          if (robj.length) preview += 'Size: ' + robj.length + ' bytes\n';
-          if (robj.total_words) preview += 'Words: ' + robj.total_words + '\n';
-          if (robj.hashes) preview += Object.keys(robj.hashes).length + ' hashes computed\n';
-          if (!preview) preview = JSON.stringify(robj).substring(0, 200);
+          // Code execution results
+          if (robj.stdout !== undefined) {
+            preview += (robj.status === 'success' ? '\u2705 ' : '\u274c ') + 'exit=' + (robj.return_code||0) + ' (' + (robj.execution_time||0) + 's)\n';
+            if (robj.stdout) preview += robj.stdout.substring(0,300);
+            if (robj.stderr) preview += '\nstderr: ' + robj.stderr.substring(0,100);
+          }
+          // Uptime/monitor results
+          else if (robj.response_time_ms !== undefined) {
+            const icon = robj.status === 'up' ? '\u2705' : (robj.status === 'timeout' ? '\u23f3' : '\u274c');
+            preview += icon + ' ' + (robj.status||'?').toUpperCase() + ' | ' + robj.response_time_ms + 'ms | ' + (robj.server||'') + '\n';
+            if (robj.performance) preview += 'Performance: ' + robj.performance;
+            if (robj.checks) {
+              robj.checks.forEach(c => {
+                const ci = c.status === 'up' ? '\u2705' : '\u274c';
+                preview += ci + ' ' + (c.url||'').substring(0,40) + ' ' + (c.response_time_ms||0) + 'ms\n';
+              });
+            }
+          }
+          // PDF results
+          else if (robj.page_count !== undefined) {
+            preview += '\ud83d\udcc4 ' + (robj.page_count||0) + ' pages | ' + (robj.total_words||0) + ' words\n';
+            if (robj.metadata && robj.metadata.title) preview += 'Title: ' + robj.metadata.title + '\n';
+            if (robj.metadata && robj.metadata.author) preview += 'Author: ' + robj.metadata.author + '\n';
+            if (robj.tables && robj.tables.length) preview += robj.tables.length + ' tables extracted\n';
+          }
+          // Security/recon results
+          else if (robj.security_score !== undefined) {
+            preview += '\ud83d\udd12 Security: ' + robj.security_score + '/100\n';
+            if (robj.security_headers_missing) preview += 'Missing: ' + robj.security_headers_missing.join(', ').substring(0,150) + '\n';
+            if (robj.server) preview += 'Server: ' + robj.server;
+          }
+          // Sentiment/NLP results
+          else if (robj.sentiment) {
+            preview += '\ud83d\udcca Sentiment: ' + (robj.sentiment.label||'?') + ' (' + (robj.sentiment.polarity||0) + ')\n';
+            if (robj.stats) preview += 'Words: ' + (robj.stats.words||0) + ' | Reading ease: ' + (robj.stats.flesch_reading_ease||0) + '\n';
+            if (robj.entities && robj.entities.total_entities) preview += 'Entities found: ' + robj.entities.total_entities;
+          }
+          // Hash results
+          else if (robj.hashes) {
+            Object.entries(robj.hashes).forEach(([k,v]) => { preview += k + ': ' + v.substring(0,24) + '...\n'; });
+          }
+          // Generic fallback
+          else {
+            if (robj.title) preview += robj.title + '\n';
+            if (robj.status) preview += 'Status: ' + robj.status + '\n';
+            if (robj.markdown_length) preview += robj.markdown_length + ' chars scraped\n';
+            if (robj.total_links) preview += robj.total_links + ' links found\n';
+            if (robj.word_count) preview += robj.word_count + ' words\n';
+            if (!preview) preview = JSON.stringify(robj).substring(0, 200);
+          }
         } catch(e) { preview = String(t.result).substring(0, 200); }
         resultHtml = '<div style="background:#0a1a0f;border:1px solid #00ff8833;padding:10px;margin-top:8px;font-size:0.75em;color:#00ff88;white-space:pre-line;">' + escHtml(preview.trim()) + '</div>';
       }
