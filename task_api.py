@@ -69,6 +69,14 @@ CATEGORY_SKILL_MAP = {
     "code": "code-execute",
     "pdf": "pdf-extract",
     "monitor": "site-monitor",
+    "solana": "solana-lookup",
+    "dns": "dns-lookup",
+    "feed": "rss-parse",
+    "screenshot": "screenshot",
+    "crypto": "crypto-price",
+    "ip": "ip-lookup",
+    "email": "email-verify",
+    "image": "image-analyze",
     "other": "text-process",
 }
 

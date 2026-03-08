@@ -1,6 +1,7 @@
 """SwarMesh Task Feeder — Auto-generates real tasks to keep the mesh alive.
 
-Posts tasks on a schedule: web scraping, data processing, monitoring.
+Posts tasks on a schedule: web scraping, data processing, monitoring,
+Solana lookups, DNS intel, RSS feeds, screenshots.
 These are real tasks with real outputs — not fake busywork.
 """
 import asyncio
@@ -163,6 +164,122 @@ TASK_TEMPLATES = [
         "description": "Extract text and metadata from the Bitcoin whitepaper PDF: https://bitcoin.org/bitcoin.pdf",
         "bounty": "0.001",
         "skill": "pdf-extract",
+    },
+    # --- Solana Blockchain Tasks ---
+    {
+        "category": "solana",
+        "description": "Get the current SOL price, 24h change, market cap, and Solana network stats including epoch progress and TPS.",
+        "bounty": "0.001",
+        "skill": "solana-lookup",
+    },
+    {
+        "category": "solana",
+        "description": "Look up the SwarMesh treasury wallet 52Pzs3ahgiJvuHEYS3QwB82EXM8122QuvoZuL5gGNgfQ — get SOL balance, token holdings, and recent transactions.",
+        "bounty": "0.001",
+        "skill": "solana-lookup",
+    },
+    {
+        "category": "solana",
+        "description": "Check Solana network health — epoch info, total supply, circulating supply, and recent TPS performance samples.",
+        "bounty": "0.0005",
+        "skill": "solana-lookup",
+    },
+    # --- DNS / WHOIS Tasks ---
+    {
+        "category": "dns",
+        "description": "Full domain intelligence report for swarmesh.xyz — WHOIS registration data, all DNS records (A, MX, NS, TXT, CNAME), and subdomain discovery.",
+        "bounty": "0.001",
+        "skill": "dns-lookup",
+    },
+    {
+        "category": "dns",
+        "description": "DNS and WHOIS lookup for solana.com — registrar, creation date, name servers, MX records, and probe for common subdomains.",
+        "bounty": "0.001",
+        "skill": "dns-lookup",
+    },
+    {
+        "category": "dns",
+        "description": "Enumerate DNS records for github.com — A, AAAA, MX, NS, TXT, SOA records. Include WHOIS data if available.",
+        "bounty": "0.0005",
+        "skill": "dns-lookup",
+    },
+    # --- RSS Feed Tasks ---
+    {
+        "category": "feed",
+        "description": "Parse the Hacker News RSS feed at https://hnrss.org/frontpage and extract the latest 20 stories with titles, links, and scores.",
+        "bounty": "0.001",
+        "skill": "rss-parse",
+    },
+    {
+        "category": "feed",
+        "description": "Parse multiple feeds: https://solana.com/news/rss.xml and https://cointelegraph.com/rss — extract latest entries from each.",
+        "bounty": "0.001",
+        "skill": "rss-parse",
+    },
+    {
+        "category": "feed",
+        "description": "Parse the TechCrunch RSS feed at https://techcrunch.com/feed/ — get latest articles with title, author, published date, and summary.",
+        "bounty": "0.0005",
+        "skill": "rss-parse",
+    },
+    # --- Screenshot Tasks ---
+    {
+        "category": "screenshot",
+        "description": "Take a screenshot of https://swarmesh.xyz — capture viewport at 1280x720, report page title, load time, and dimensions.",
+        "bounty": "0.001",
+        "skill": "screenshot",
+    },
+    {
+        "category": "screenshot",
+        "description": "Capture a full-page screenshot of https://solana.com — include entire scrollable page, report load time and page dimensions.",
+        "bounty": "0.001",
+        "skill": "screenshot",
+    },
+    # --- Crypto Price Tasks ---
+    {
+        "category": "crypto",
+        "description": "Get current prices for Bitcoin, Ethereum, Solana, and Dogecoin with 24h change, market cap, and volume.",
+        "bounty": "0.001",
+        "skill": "crypto-price",
+    },
+    {
+        "category": "crypto",
+        "description": "Show the top 20 cryptocurrencies by market cap with price, 24h and 7d change.",
+        "bounty": "0.001",
+        "skill": "crypto-price",
+    },
+    {
+        "category": "crypto",
+        "description": "What are the trending coins on CoinGecko right now? Show names, symbols, and market cap rank.",
+        "bounty": "0.0005",
+        "skill": "crypto-price",
+    },
+    # --- IP / Geo Tasks ---
+    {
+        "category": "ip",
+        "description": "IP geolocation lookup for 8.8.8.8 — get location, ISP, ASN, reverse DNS, and whether it's a proxy or hosting IP.",
+        "bounty": "0.0005",
+        "skill": "ip-lookup",
+    },
+    {
+        "category": "ip",
+        "description": "Look up the IP addresses for cloudflare.com and google.com — get geolocation, ISP, and threat flags.",
+        "bounty": "0.001",
+        "skill": "ip-lookup",
+    },
+    # --- Email Verify Tasks ---
+    {
+        "category": "email",
+        "description": "Verify these email addresses: admin@google.com test@throwaway.email hello@swarmesh.xyz",
+        "bounty": "0.001",
+        "skill": "email-verify",
+    },
+    # --- Image Analysis Tasks ---
+    {
+        "category": "image",
+        "description": "Analyze this image — dimensions, format, colors: https://picsum.photos/id/10/400/300",
+        "bounty": "0.0005",
+        "skill": "image-analyze",
     },
 ]
 

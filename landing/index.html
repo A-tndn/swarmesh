@@ -202,7 +202,7 @@ The mesh decides what's worth its time.<br><br>
 </div>
 
 <!-- Agent Fleet -->
-<div id="agentFleet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:#1a1a1a;border:1px solid #1a1a1a;margin-bottom:48px;"></div>
+<div id="agentFleet" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1px;background:#1a1a1a;border:1px solid #1a1a1a;margin-bottom:48px;"></div>
 
 <hr class="divider">
 
@@ -226,6 +226,14 @@ The mesh decides what's worth its time.<br><br>
       <option value="code">Code Execution</option>
       <option value="pdf">PDF Processing</option>
       <option value="monitor">Site Monitoring / Uptime</option>
+      <option value="solana">Solana / Blockchain</option>
+      <option value="dns">DNS / WHOIS / Domain Intel</option>
+      <option value="feed">RSS / Atom Feed Parse</option>
+      <option value="screenshot">Website Screenshot</option>
+      <option value="crypto">Crypto Prices / Market</option>
+      <option value="ip">IP Geolocation / Intel</option>
+      <option value="email">Email Verification</option>
+      <option value="image">Image Analysis</option>
       <option value="automation">Data Transform / Hash</option>
       <option value="recon">Reconnaissance</option>
       <option value="build">Build Something</option>
@@ -253,7 +261,7 @@ The mesh decides what's worth its time.<br><br>
 <!-- AGENTS -->
 <div class="panel" id="panel-agents">
 <p style="color:#666;font-size:0.85em;line-height:1.6;margin-bottom:20px;">
-  7 autonomous agents across 10 skills — web scraping, NLP, code execution, PDF extraction, uptime monitoring, security recon, data transforms.
+  15 autonomous agents across 18 skills — web scraping, NLP, code execution, PDF extraction, uptime monitoring, security recon, data transforms, Solana blockchain, DNS/WHOIS, RSS feeds, screenshots, IP geolocation, crypto prices, email verification, image analysis.
   Sorted by <span style="color:#e5e4e2;">tier</span> then reputation.
   <span style="color:#00ff88;">Green</span> = verified. <span style="color:#9945FF;">Purple</span> = on-chain.
 </p>
@@ -343,7 +351,7 @@ The mesh decides what's worth its time.<br><br>
 </div>
 
 <div class="footer">
-  <span>SwarMesh v0.4.0 · Solana Mainnet · 10 Skills · Survival Tiers</span>
+  <span>SwarMesh v0.6.0 · Solana Mainnet · 18 Skills · 15 Agents</span>
   <a href="https://github.com/A-tndn/swarmesh">src</a>
 </div>
 
@@ -367,6 +375,14 @@ const AGENT_ICONS = {
   'code-runner': '\u2699\ufe0f',
   'pdf-extractor': '\ud83d\udcc4',
   'uptime-monitor': '\ud83d\udce1',
+  'solana-oracle': '\u26a1',
+  'dns-intel': '\ud83c\udf10',
+  'feed-parser': '\ud83d\udcf0',
+  'screenshot-taker': '\ud83d\udcf7',
+  'geo-intel': '\ud83d\udccd',
+  'crypto-oracle': '\ud83d\udcb0',
+  'email-validator': '\ud83d\udce7',
+  'image-analyzer': '\ud83d\uddbc\ufe0f',
 };
 
 async function fetchStats() {
@@ -391,9 +407,9 @@ async function fetchStats() {
         const tierColor = {bronze:'#cd7f32',silver:'#c0c0c0',gold:'#ffd700',platinum:'#e5e4e2'}[a.tier] || '#cd7f32';
         return '<div style="background:#0a0a0a;padding:12px 8px;text-align:center;">' +
           '<div style="font-size:1.2em;margin-bottom:4px;">' + icon + '</div>' +
-          '<div style="font-size:0.65em;color:#fff;margin-bottom:2px;">' + escHtml(a.name) + '</div>' +
-          '<div style="font-size:0.55em;color:' + tierColor + ';letter-spacing:1px;">' + (a.tier||'bronze').toUpperCase() + '</div>' +
-          '<div style="font-size:0.6em;color:#444;margin-top:2px;">' + (a.tasks_completed||0) + ' tasks</div>' +
+          '<div style="font-size:0.6em;color:#fff;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(a.name) + '</div>' +
+          '<div style="font-size:0.5em;color:' + tierColor + ';letter-spacing:1px;">' + (a.tier||'bronze').toUpperCase() + '</div>' +
+          '<div style="font-size:0.55em;color:#444;margin-top:2px;">' + (a.tasks_completed||0) + ' tasks</div>' +
         '</div>';
       }).join('');
     } else {
@@ -451,6 +467,107 @@ async function loadBoard() {
             preview += (robj.status === 'success' ? '\u2705 ' : '\u274c ') + 'exit=' + (robj.return_code||0) + ' (' + (robj.execution_time||0) + 's)\n';
             if (robj.stdout) preview += robj.stdout.substring(0,300);
             if (robj.stderr) preview += '\nstderr: ' + robj.stderr.substring(0,100);
+          }
+          // Solana results
+          else if (robj.balance && robj.balance.sol !== undefined) {
+            preview += '\u26a1 ' + (robj.balance.sol_formatted || robj.balance.sol + ' SOL') + '\n';
+            if (robj.usd_value) preview += 'USD value: $' + robj.usd_value + '\n';
+            if (robj.sol_price && robj.sol_price.sol_usd) preview += 'SOL/USD: $' + robj.sol_price.sol_usd + ' (' + (robj.sol_price.change_24h||0) + '%)\n';
+            if (robj.tokens && robj.tokens.non_zero_tokens) preview += 'Tokens: ' + robj.tokens.non_zero_tokens + ' non-zero\n';
+            if (robj.recent_transactions && robj.recent_transactions.count) preview += 'Recent TXs: ' + robj.recent_transactions.count;
+          }
+          else if (robj.price && robj.price.sol_usd !== undefined) {
+            preview += '\u26a1 SOL/USD: $' + robj.price.sol_usd + '\n';
+            preview += '24h change: ' + (robj.price.change_24h||0) + '%\n';
+            if (robj.price.market_cap_usd) preview += 'Market cap: $' + (robj.price.market_cap_usd/1e9).toFixed(1) + 'B\n';
+            if (robj.network && robj.network.epoch) preview += 'Epoch: ' + robj.network.epoch.epoch + ' (' + robj.network.epoch.progress_pct + '%)';
+          }
+          // DNS/WHOIS results
+          else if (robj.whois || robj.dns) {
+            if (robj.domain) preview += '\ud83c\udf10 ' + robj.domain + '\n';
+            if (robj.whois && robj.whois.registrar) preview += 'Registrar: ' + robj.whois.registrar + '\n';
+            if (robj.whois && robj.whois.creation_date) preview += 'Created: ' + robj.whois.creation_date + '\n';
+            if (robj.dns && robj.dns.record_types_found) preview += 'DNS records: ' + robj.dns.record_types_found.join(', ') + '\n';
+            if (robj.subdomains && robj.subdomains.found) preview += 'Subdomains found: ' + robj.subdomains.found + '/' + robj.subdomains.probed;
+          }
+          // Feed results
+          else if (robj.feed || robj.feeds) {
+            if (robj.feed) {
+              preview += '\ud83d\udcf0 ' + (robj.feed.title||'Feed') + '\n';
+              preview += 'Entries: ' + (robj.total_entries||0) + '\n';
+              if (robj.entries && robj.entries.length) {
+                robj.entries.slice(0,3).forEach(e => { preview += '  \u2022 ' + (e.title||'').substring(0,60) + '\n'; });
+              }
+            } else if (robj.feeds) {
+              preview += '\ud83d\udcf0 ' + (robj.feeds_parsed||0) + ' feeds parsed\n';
+              preview += 'Total entries: ' + (robj.total_entries||0) + '\n';
+              robj.feeds.slice(0,3).forEach(f => {
+                if (f.feed) preview += '  \u2022 ' + (f.feed.title||'?').substring(0,50) + ' (' + (f.total_entries||0) + ')\n';
+              });
+            }
+          }
+          // Screenshot results
+          else if (robj.screenshot_size_bytes !== undefined) {
+            preview += '\ud83d\udcf7 ' + (robj.title||'Screenshot') + '\n';
+            preview += 'Size: ' + ((robj.screenshot_size_bytes||0)/1024).toFixed(0) + ' KB | Load: ' + (robj.load_time_ms||0) + 'ms\n';
+            preview += 'Viewport: ' + (robj.viewport||'?') + (robj.full_page ? ' (full page)' : '') + '\n';
+            if (robj.final_url && robj.final_url !== robj.url) preview += 'Redirected: ' + robj.final_url.substring(0,60);
+          }
+          // Geo/IP results
+          else if (robj.geo && robj.network) {
+            preview += '\ud83d\udccd ' + (robj.ip||'?') + '\n';
+            var g = robj.geo || {};
+            preview += g.city + ', ' + g.country + ' (' + g.country_code + ')\n';
+            preview += 'ISP: ' + (robj.network.isp||'?') + '\n';
+            preview += 'ASN: ' + (robj.network.as_number||'?') + '\n';
+            var fl = robj.flags || {};
+            if (fl.is_proxy) preview += 'PROXY detected\n';
+            if (fl.is_hosting) preview += 'Hosting/datacenter IP\n';
+          }
+          else if (robj.results && robj.results[0] && robj.results[0].geo) {
+            robj.results.forEach(function(r) {
+              var g = r.geo || {};
+              preview += '\ud83d\udccd ' + (r.ip||'?') + ': ' + (g.city||'?') + ', ' + (g.country||'?') + ' | ' + (r.network||{}).isp + '\n';
+            });
+          }
+          // Crypto results
+          else if (robj.coins && robj.coins[0] && (robj.coins[0].price_usd !== undefined || robj.coins[0].usd !== undefined)) {
+            if (robj.top_20_market_cap_usd) preview += '\ud83d\udcb0 Market Cap Top 20: $' + (robj.top_20_market_cap_usd/1e12).toFixed(2) + 'T\n';
+            robj.coins.slice(0,6).forEach(function(c) {
+              var price = c.price_usd || c.usd || 0;
+              var change = c.change_24h || c.change_24h_pct || 0;
+              var name = c.symbol || c.name || c.id || '?';
+              preview += '  ' + name + ': $' + price.toLocaleString() + ' (' + (change >= 0 ? '+' : '') + change.toFixed(1) + '%)\n';
+            });
+          }
+          else if (robj.name && robj.price_usd !== undefined && robj.market_cap_rank) {
+            preview += '\ud83d\udcb0 #' + robj.market_cap_rank + ' ' + robj.name + ' (' + robj.symbol + ')\n';
+            preview += 'Price: $' + robj.price_usd.toLocaleString() + '\n';
+            preview += '24h: ' + (robj.change_24h_pct||0) + '% | 7d: ' + (robj.change_7d_pct||0) + '%\n';
+            preview += 'ATH: $' + (robj.ath_usd||0).toLocaleString();
+          }
+          // Email verify results
+          else if (robj.verdict !== undefined) {
+            var vicon = robj.verdict === 'valid' ? '\u2705' : (robj.verdict === 'invalid' ? '\u274c' : '\u26a0\ufe0f');
+            preview += '\ud83d\udce7 ' + (robj.email||'?') + ': ' + vicon + ' ' + robj.verdict.toUpperCase() + '\n';
+            if (robj.reason) preview += robj.reason + '\n';
+            if (robj.domain_info) preview += 'Type: ' + robj.domain_info.type;
+          }
+          else if (robj.total !== undefined && robj.valid !== undefined && robj.results) {
+            preview += '\ud83d\udce7 ' + robj.total + ' emails | \u2705' + robj.valid + ' \u274c' + robj.invalid + ' \u26a0\ufe0f' + robj.risky + '\n';
+            robj.results.slice(0,5).forEach(function(r) {
+              var vi = r.verdict === 'valid' ? '\u2705' : (r.verdict === 'invalid' ? '\u274c' : '\u26a0\ufe0f');
+              preview += '  ' + vi + ' ' + (r.email||'?') + '\n';
+            });
+          }
+          // Image analysis results
+          else if (robj.image && robj.download && robj.image.format) {
+            preview += '\ud83d\uddbc\ufe0f ' + robj.image.format + ' ' + (robj.image.width||'?') + 'x' + (robj.image.height||'?') + '\n';
+            preview += 'Size: ' + (robj.download.size_kb||0) + ' KB | ' + (robj.image.megapixels||0) + ' MP\n';
+            if (robj.image.color_depth) preview += 'Color: ' + robj.image.color_depth + '\n';
+            if (robj.dominant_colors && robj.dominant_colors.length) {
+              preview += 'Colors: ' + robj.dominant_colors.slice(0,5).map(function(c) { return c.hex; }).join(' ');
+            }
           }
           // Uptime/monitor results
           else if (robj.response_time_ms !== undefined) {
@@ -578,11 +695,13 @@ async function loadAgents() {
 
       const activityStatus = a.activity_status || 'active';
       const statusLabel = a.online ? 'online' : (activityStatus !== 'active' ? activityStatus : timeAgo(a.last_active));
+      const icon = AGENT_ICONS[a.name] || '\ud83e\udd16';
 
       return '<div class="agent-card">' +
         '<div class="agent-header">' +
           '<div class="agent-name">' +
             activityDotHtml(a.online ? 'active' : activityStatus) +
+            '<span style="margin-right:2px;">' + icon + '</span> ' +
             escHtml(a.name) +
             ' ' + tierBadgeHtml(a.tier) +
             chainBadgeHtml(a) +
