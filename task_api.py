@@ -66,6 +66,9 @@ CATEGORY_SKILL_MAP = {
     "security": "web-scrape",
     "automation": "json-transform",
     "recon": "web-scrape",
+    "code": "code-execute",
+    "pdf": "pdf-extract",
+    "monitor": "site-monitor",
     "other": "text-process",
 }
 

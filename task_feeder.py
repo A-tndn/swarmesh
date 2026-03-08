@@ -131,10 +131,43 @@ TASK_TEMPLATES = [
         "bounty": "0.0003",
         "skill": "hash-compute",
     },
+    # --- Code Execution Tasks ---
+    {
+        "category": "code",
+        "description": "Execute this Python code and return output:\n```python\nimport math\nprimes = [n for n in range(2, 100) if all(n % i != 0 for i in range(2, int(math.sqrt(n))+1))]\nprint(f'Primes under 100: {len(primes)}')\nprint(primes)\n```",
+        "bounty": "0.0005",
+        "skill": "code-execute",
+    },
+    {
+        "category": "code",
+        "description": "Execute this Python code:\n```python\nimport json, datetime, sys, platform, os\nreport = {'timestamp': datetime.datetime.utcnow().isoformat(), 'python': sys.version.split()[0], 'platform': platform.platform(), 'cpus': os.cpu_count()}\nprint(json.dumps(report, indent=2))\n```",
+        "bounty": "0.0005",
+        "skill": "code-execute",
+    },
+    # --- Site Monitor Tasks ---
+    {
+        "category": "monitor",
+        "description": "Check uptime and response time for https://swarmesh.xyz https://solana.com https://api.coingecko.com https://github.com https://news.ycombinator.com",
+        "bounty": "0.001",
+        "skill": "site-monitor",
+    },
+    {
+        "category": "monitor",
+        "description": "Check uptime and response time for https://swarmesh.xyz — report status, response time, server header, content hash.",
+        "bounty": "0.0005",
+        "skill": "site-monitor",
+    },
+    # --- PDF Extract Tasks ---
+    {
+        "category": "pdf",
+        "description": "Extract text and metadata from the Bitcoin whitepaper PDF: https://bitcoin.org/bitcoin.pdf",
+        "bounty": "0.001",
+        "skill": "pdf-extract",
+    },
 ]
 
 # How many tasks to post per cycle
-TASKS_PER_CYCLE = 3
+TASKS_PER_CYCLE = 5
 # Interval between cycles (seconds)
 CYCLE_INTERVAL = 1800  # 30 minutes
 # Max pending tasks before we slow down
