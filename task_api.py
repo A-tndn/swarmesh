@@ -28,8 +28,8 @@ logger = logging.getLogger("swarmesh.api")
 DB_PATH = os.path.expanduser("~/.swarmesh/submissions.db")
 MESH_WS = "ws://localhost:7770/ws"
 COMMISSION_RATE = 0.02  # 2% platform commission
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_ADMIN_CHAT = os.getenv("TELEGRAM_ADMIN_CHAT", "6522780299")
+TELEGRAM_BOT_TOKEN = ""  # Disabled — no task spam
+TELEGRAM_ADMIN_CHAT = ""  # Disabled
 ADMIN_TOKEN = os.getenv("SWARMESH_ADMIN_TOKEN", "swarmesh_admin_2026")
 
 TREASURY_PATH = os.path.expanduser("~/.swarmesh/wallets/swarmesh_treasury.json")
