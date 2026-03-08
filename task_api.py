@@ -672,6 +672,7 @@ class MeshBridge:
     def _build_input(self, description: str, category: str) -> dict:
         import re
         urls = re.findall(r'https?://[^\s<>"{}|\\^`\[\]]+', description)
+        urls = [re.sub(r'[).,;:]+$', '', u) for u in urls]
         if category == "data" and urls:
             return {"url": urls[0], "description": description}
         elif category == "security" and urls:
