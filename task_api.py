@@ -344,6 +344,17 @@ async def _tier_decay_loop():
                     if new_tier != old_tier:
                         conn.execute("UPDATE http_agents SET tier=? WHERE agent_id=?",
                                      (new_tier, ad["agent_id"]))
+            # --- Auto-expire stale tasks ---
+            import datetime as _dt
+            stale_cutoff = (_dt.datetime.utcnow() - _dt.timedelta(hours=6)).strftime("%Y-%m-%d %H:%M:%S")
+            expired = conn.execute(
+                "UPDATE submissions SET status='expired' WHERE status IN ('pending','posted') AND created_at < ?",
+                (stale_cutoff,)
+            ).rowcount
+            # Clear orphan queue items
+            orphans = conn.execute("DELETE FROM agent_task_queue WHERE claimed=0").rowcount
+            if expired > 0 or orphans > 0:
+                logger.info("Self-heal: expired %d stale tasks, cleared %d orphan queue items", expired, orphans)
             conn.commit()
             conn.close()
         except asyncio.CancelledError:
@@ -567,6 +578,10 @@ class MeshBridge:
                 activity = agent["activity_status"] if "activity_status" in agent.keys() else "active"
                 if agent["callback_url"] and activity == "active":
                     asyncio.create_task(self._callback_agent(dict(agent), task_data))
+                # Wake-on-demand: notify waiting long-poll connections
+                aid = agent["agent_id"]
+                if aid in _wake_events:
+                    _wake_events[aid].set()
         conn.commit()
         conn.close()
 
@@ -852,6 +867,40 @@ async def handle_get_task(request):
 
 # --- Agent HTTP API ---
 
+
+async def handle_agent_info(request):
+    """Public endpoint — how to register as an external agent."""
+    return web.json_response({
+        "service": "swarmesh",
+        "version": "0.8.0",
+        "register_url": "/api/agent/register",
+        "register_method": "POST",
+        "register_body": {
+            "name": "your-agent-name (required)",
+            "skills": ["list", "of", "skills"],
+            "description": "What your agent does (optional)",
+            "callback_url": "https://your-server.com/webhook (optional, for wake-on-demand)",
+            "solana_address": "Your Solana wallet address (optional, for on-chain identity)",
+        },
+        "auth": "Bearer token returned on registration. Include in all subsequent requests.",
+        "endpoints": {
+            "poll_tasks": "GET /api/agent/tasks (polling mode)",
+            "wait_tasks": "GET /api/agent/tasks/wait?timeout=30 (long-poll mode, recommended)",
+            "claim_task": "POST /api/agent/claim/{task_id}",
+            "submit_result": "POST /api/agent/submit/{task_id}",
+            "profile": "GET /api/agent/profile",
+        },
+        "available_skills": [
+            "web-scrape", "text-process", "json-transform", "code-execute",
+            "pdf-extract", "site-monitor", "solana-lookup", "dns-lookup",
+            "rss-parse", "screenshot", "ip-lookup", "crypto-price",
+            "email-verify", "image-analyze", "github-lookup", "youtube-lookup",
+            "translate", "port-scan", "betting-odds",
+        ],
+        "tiers": "bronze -> silver (5 tasks) -> gold (20 tasks + wallet) -> platinum (50 tasks + wallet)",
+        "note": "External agents welcome. Register, poll or long-poll for tasks, claim, process, submit results.",
+    })
+
 async def handle_agent_register(request):
     try:
         data = await request.json()
@@ -1081,7 +1130,77 @@ async def handle_agent_tasks(request):
     return web.json_response({"agent_id": agent["agent_id"], "tasks": tasks, "count": len(tasks)})
 
 
+
+# --- Wake-on-demand: long-poll support ---
+_wake_events: dict = {}  # agent_id -> asyncio.Event
+
+async def handle_agent_tasks_wait(request):
+    """Long-poll endpoint — blocks until a task is available or timeout.
+    Agents call GET /api/agent/tasks/wait?timeout=30 instead of polling.
+    Returns immediately if tasks already queued, otherwise waits."""
+    agent = auth_agent(request)
+    if not agent:
+        return web.json_response({"error": "unauthorized"}, status=401)
+    timeout = min(int(request.query.get("timeout", "30")), 120)
+    agent_id = agent["agent_id"]
+
+    # Update last_active
+    conn = get_db()
+    conn.execute("UPDATE http_agents SET last_active=datetime('now'), activity_status='active' WHERE agent_id=?",
+                 (agent_id,))
+    conn.commit()
+
+    # Check if tasks already available
+    rows = conn.execute(
+        "SELECT * FROM agent_task_queue WHERE agent_id=? AND claimed=0 ORDER BY created_at ASC",
+        (agent_id,)
+    ).fetchall()
+    conn.close()
+    if rows:
+        tasks = []
+        for r in rows:
+            try:
+                task_data = json.loads(r["task_json"])
+            except Exception:
+                task_data = {}
+            tasks.append({
+                "queue_id": r["id"], "task_id": r["task_id"], "skill": r["skill"],
+                "task": task_data, "queued_at": r["created_at"],
+            })
+        return web.json_response({"agent_id": agent_id, "tasks": tasks, "count": len(tasks), "waited": False})
+
+    # No tasks — wait for wake signal or timeout
+    event = asyncio.Event()
+    _wake_events[agent_id] = event
+    try:
+        await asyncio.wait_for(event.wait(), timeout=timeout)
+    except asyncio.TimeoutError:
+        pass
+    finally:
+        _wake_events.pop(agent_id, None)
+
+    # Re-check after wake
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT * FROM agent_task_queue WHERE agent_id=? AND claimed=0 ORDER BY created_at ASC",
+        (agent_id,)
+    ).fetchall()
+    conn.close()
+    tasks = []
+    for r in rows:
+        try:
+            task_data = json.loads(r["task_json"])
+        except Exception:
+            task_data = {}
+        tasks.append({
+            "queue_id": r["id"], "task_id": r["task_id"], "skill": r["skill"],
+            "task": task_data, "queued_at": r["created_at"],
+        })
+    return web.json_response({"agent_id": agent_id, "tasks": tasks, "count": len(tasks), "waited": True})
+
+
 async def handle_agent_claim(request):
+    """Atomic checkout lock — returns 409 if another agent already claimed."""
     agent = auth_agent(request)
     if not agent:
         return web.json_response({"error": "unauthorized"}, status=401)
@@ -1089,28 +1208,48 @@ async def handle_agent_claim(request):
     if not task_id:
         return web.json_response({"error": "task_id required"}, status=400)
     conn = get_db()
+    # Check if ANY agent already claimed this task (atomic lock)
+    already_claimed = conn.execute(
+        "SELECT agent_id FROM agent_task_queue WHERE task_id=? AND claimed=1",
+        (task_id,)
+    ).fetchone()
+    if already_claimed:
+        claimer_id = already_claimed["agent_id"]
+        claimer = conn.execute("SELECT name FROM http_agents WHERE agent_id=?", (claimer_id,)).fetchone()
+        claimer_name = claimer["name"] if claimer else claimer_id
+        conn.close()
+        return web.json_response({
+            "error": "task already claimed",
+            "claimed_by": claimer_name,
+            "task_id": task_id,
+        }, status=409)
+    # Check this agent has the task in queue
     queue_row = conn.execute(
         "SELECT * FROM agent_task_queue WHERE agent_id=? AND task_id=? AND claimed=0",
         (agent["agent_id"], task_id)
     ).fetchone()
     if not queue_row:
-        conn.close()
-        return web.json_response({"error": "task not found in your queue or already claimed"}, status=404)
-    conn.execute("UPDATE agent_task_queue SET claimed=1 WHERE agent_id=? AND task_id=?",
-                 (agent["agent_id"], task_id))
-    conn.commit()
-    conn.close()
-    await bridge.claim_task_on_mesh(task_id, agent["name"])
-    conn = get_db()
+        # Allow direct claim even without queue entry (for external agents or wake-on-demand)
+        sub = conn.execute(
+            "SELECT mesh_task_id, status FROM submissions WHERE mesh_task_id=? AND status IN ('posted','pending')",
+            (task_id,)
+        ).fetchone()
+        if not sub:
+            conn.close()
+            return web.json_response({"error": "task not found or not available"}, status=404)
+    # Atomic claim: mark in queue + update submission in one transaction
+    conn.execute("UPDATE agent_task_queue SET claimed=1 WHERE task_id=?", (task_id,))
     conn.execute(
         "UPDATE submissions SET status='claimed', worker=?, claimed_at=datetime('now') WHERE mesh_task_id=?",
-        (f"http:{agent['name'][:20]}", task_id)
+        ("http:" + agent["name"][:20], task_id)
     )
     conn.commit()
     conn.close()
+    await bridge.claim_task_on_mesh(task_id, agent["name"])
+    logger.info("Task %s claimed by %s (checkout lock)", task_id, agent["name"])
     return web.json_response({
         "status": "claimed", "task_id": task_id,
-        "submit_url": f"/api/agent/submit/{task_id}", "message": "Task claimed.",
+        "submit_url": "/api/agent/submit/" + task_id, "message": "Task claimed. Checkout locked.",
     })
 
 
@@ -1366,8 +1505,10 @@ app.router.add_get('/api/task/{id}', handle_get_task)
 app.router.add_get('/api/board', handle_board)
 app.router.add_get('/api/submissions', handle_board)
 
+app.router.add_get('/api/agent/register', handle_agent_info)
 app.router.add_post('/api/agent/register', handle_agent_register)
 app.router.add_get('/api/agent/tasks', handle_agent_tasks)
+app.router.add_get('/api/agent/tasks/wait', handle_agent_tasks_wait)
 app.router.add_post('/api/agent/claim/{task_id}', handle_agent_claim)
 app.router.add_post('/api/agent/submit/{task_id}', handle_agent_submit)
 app.router.add_get('/api/agent/profile', handle_agent_profile)
