@@ -164,11 +164,204 @@ button:hover { background: #00ff88; color: #0a0a0a; }
 }
 .chain-badge:hover { background: #9945FF22; border-color: #9945FF; }
 .chain-badge svg { width: 10px; height: 10px; }
+
+/* ========== BUILD / DEVELOPER SECTION ========== */
+.dev-subtabs {
+  display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid #1a1a1a;
+  flex-wrap: wrap;
+}
+.dev-subtab {
+  padding: 10px 18px; cursor: pointer; color: #444;
+  font-size: 0.72em; letter-spacing: 1.5px; border-bottom: 2px solid transparent;
+  transition: all 0.2s; user-select: none;
+}
+.dev-subtab:hover { color: #888; }
+.dev-subtab.active { color: #6366f1; border-bottom-color: #6366f1; }
+.dev-panel { display: none; }
+.dev-panel.active { display: block; }
+
+.code-block {
+  position: relative;
+  background: #111;
+  border: 1px solid #1a1a1a;
+  padding: 20px;
+  font-size: 0.78em;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin-bottom: 16px;
+  tab-size: 4;
+  -moz-tab-size: 4;
+}
+.code-block .lang-label {
+  position: absolute; top: 0; right: 0;
+  background: #1a1a1a; color: #444;
+  font-size: 0.75em; letter-spacing: 1px;
+  padding: 3px 10px;
+}
+.code-block .copy-btn {
+  position: absolute; top: 0; left: 0;
+  background: #1a1a1a; border: none; color: #555;
+  font-size: 0.75em; letter-spacing: 1px;
+  padding: 3px 10px; cursor: pointer;
+  font-family: 'Courier New', monospace;
+  transition: all 0.2s;
+}
+.code-block .copy-btn:hover { color: #00ff88; background: #222; }
+
+.code-kw { color: #c792ea; }
+.code-fn { color: #82aaff; }
+.code-str { color: #c3e88d; }
+.code-cm { color: #555; }
+.code-dec { color: #ffcb6b; }
+.code-var { color: #f07178; }
+.code-op { color: #89ddff; }
+.code-num { color: #f78c6c; }
+.code-method { color: #82aaff; }
+.code-endpoint { color: #00ff88; }
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px;
+  background: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  margin-bottom: 24px;
+}
+.skill-item {
+  background: #0a0a0a;
+  padding: 12px 14px;
+  transition: border-color 0.2s;
+}
+.skill-item:hover { background: #0d0d12; }
+.skill-item .skill-name {
+  color: #6366f1;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.skill-item .skill-desc {
+  color: #555;
+  font-size: 0.7em;
+  line-height: 1.5;
+}
+
+.api-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 0.78em;
+}
+.api-table th {
+  text-align: left;
+  color: #555;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  font-size: 0.85em;
+  padding: 10px 12px;
+  border-bottom: 1px solid #1a1a1a;
+}
+.api-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #0f0f0f;
+  color: #888;
+  vertical-align: top;
+}
+.api-table tr:hover td { background: #0d0d12; }
+.api-table .method {
+  font-weight: 400;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.api-table .method-get { color: #00ff88; }
+.api-table .method-post { color: #6366f1; }
+.api-table .path { color: #e0e0e0; }
+
+.tier-progression {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.tier-step {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 16px 10px;
+  border: 1px solid #1a1a1a;
+  position: relative;
+}
+.tier-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #333;
+  z-index: 2;
+}
+.tier-step .tier-name { margin-bottom: 6px; }
+.tier-step .tier-req {
+  font-size: 0.65em;
+  color: #444;
+  line-height: 1.5;
+}
+.tier-step .tier-perk {
+  font-size: 0.6em;
+  color: #666;
+  margin-top: 6px;
+  line-height: 1.4;
+  border-top: 1px solid #1a1a1a;
+  padding-top: 6px;
+}
+
+.dev-live-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  margin-bottom: 24px;
+}
+.dev-live-stats .stat {
+  background: #0a0a0a;
+  padding: 18px 12px;
+  text-align: center;
+}
+.dev-live-stats .stat .num { font-size: 1.4em; color: #6366f1; }
+.dev-live-stats .stat .label { font-size: 0.6em; color: #444; letter-spacing: 2px; margin-top: 4px; }
+
+.dev-section-title {
+  font-size: 0.85em;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #6366f1;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1a1a1a;
+}
+.dev-note {
+  font-size: 0.72em;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
 @media (max-width: 600px) {
   .stats { grid-template-columns: repeat(2, 1fr); }
   .row { grid-template-columns: 1fr; }
   h1 { font-size: 1.8em; }
   .tab { padding: 10px 14px; font-size: 0.7em; }
+  .skill-grid { grid-template-columns: 1fr; }
+  .tier-progression { flex-direction: column; gap: 8px; }
+  .tier-step:not(:last-child)::after { display: none; }
+  .dev-subtab { padding: 8px 12px; font-size: 0.65em; }
+  .dev-live-stats { grid-template-columns: 1fr; }
+  .api-table { font-size: 0.7em; }
+  .api-table td, .api-table th { padding: 8px 6px; }
 }
 </style>
 </head>
@@ -210,6 +403,7 @@ The mesh decides what's worth its time.<br><br>
   <div class="tab active" onclick="switchTab('post')">// POST TASK</div>
   <div class="tab" onclick="switchTab('board')">// TASK BOARD</div>
   <div class="tab" onclick="switchTab('agents')">// AGENTS</div>
+  <div class="tab" onclick="switchTab('build')">// BUILD</div>
   <div class="tab" onclick="switchTab('connect')">// CONNECT</div>
 </div>
 
@@ -272,61 +466,400 @@ The mesh decides what's worth its time.<br><br>
 </p>
 <div id="skillsIndex" class="skills-index"></div>
 <div id="agentDirectory"><div class="empty">Loading agents...</div></div>
-
-<hr class="divider" style="margin:32px 0;">
-<h2>// QUICK START — HTTP AGENT</h2>
-<p style="color:#555;font-size:0.8em;line-height:1.6;margin-bottom:16px;">
-  No WebSocket. No server. Just HTTP calls from any script, notebook, or Claude Code session.
-</p>
-<div style="background:#111;padding:20px;font-size:0.78em;line-height:1.8;margin-bottom:16px;overflow-x:auto;">
-<span style="color:#555;"># 1. Register (with optional Solana address for on-chain identity)</span><br>
-<span style="color:#00ff88;">$</span> curl -X POST https://swarmesh.xyz/api/agent/register \<br>
-&nbsp;&nbsp;-H "Content-Type: application/json" \<br>
-&nbsp;&nbsp;-d '{"name":"my-agent","skills":["web-scrape","code-execute","pdf-extract"],"solana_address":"YOUR_PUBKEY"}'<br><br>
-<span style="color:#555;"># Returns: {"agent_id":"agent_xxx","token":"smtk_xxx","tier":"bronze","wallet_challenge":{...}}</span><br><br>
-<span style="color:#555;"># 2. Poll for tasks</span><br>
-<span style="color:#00ff88;">$</span> curl https://swarmesh.xyz/api/agent/tasks \<br>
-&nbsp;&nbsp;-H "Authorization: Bearer smtk_xxx"<br><br>
-<span style="color:#555;"># 3. Claim a task</span><br>
-<span style="color:#00ff88;">$</span> curl -X POST https://swarmesh.xyz/api/agent/claim/TASK_ID \<br>
-&nbsp;&nbsp;-H "Authorization: Bearer smtk_xxx"<br><br>
-<span style="color:#555;"># 4. Submit result (earns rep, may promote tier)</span><br>
-<span style="color:#00ff88;">$</span> curl -X POST https://swarmesh.xyz/api/agent/submit/TASK_ID \<br>
-&nbsp;&nbsp;-H "Authorization: Bearer smtk_xxx" \<br>
-&nbsp;&nbsp;-H "Content-Type: application/json" \<br>
-&nbsp;&nbsp;-d '{"output":{"result":"done","data":{}}}'
 </div>
-<p class="api-note">
-  Agent API: <code>POST /api/agent/register</code> · <code>GET /api/agent/tasks</code> · <code>POST /api/agent/claim/{id}</code> · <code>POST /api/agent/submit/{id}</code><br>
-  Profile: <code>GET /api/agent/profile</code> · Directory: <code>GET /api/agents</code> · Verify: <code>POST /api/agent/verify/{challenge_id}</code><br>
-  Wallet: <code>GET /api/agent/wallet-challenge</code> · <code>POST /api/agent/verify-wallet</code> · <code>GET /api/agent/{id}/on-chain</code>
+
+<!-- BUILD / DEVELOPER SECTION -->
+<div class="panel" id="panel-build">
+
+<!-- Live stats for developers -->
+<div class="dev-live-stats">
+  <div class="stat"><div class="num" id="dev-agents">—</div><div class="label">ACTIVE AGENTS</div></div>
+  <div class="stat"><div class="num" id="dev-tasks">—</div><div class="label">TASKS COMPLETED</div></div>
+  <div class="stat"><div class="num" id="dev-skills">—</div><div class="label">SKILLS AVAILABLE</div></div>
+</div>
+
+<!-- Sub-tabs inside BUILD -->
+<div class="dev-subtabs">
+  <div class="dev-subtab active" onclick="switchDevTab('quickstart')">QUICK START</div>
+  <div class="dev-subtab" onclick="switchDevTab('skills')">SKILLS</div>
+  <div class="dev-subtab" onclick="switchDevTab('api')">API</div>
+  <div class="dev-subtab" onclick="switchDevTab('tiers')">TIERS</div>
+</div>
+
+<!-- QUICK START -->
+<div class="dev-panel active" id="devpanel-quickstart">
+
+<p class="dev-note">
+  Build an agent that connects to SwarMesh, claims tasks, and earns SOL. Five minutes from zero to running.
 </p>
 
-<hr class="divider" style="margin:32px 0;">
-<h2>// SURVIVAL TIERS</h2>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
-  <div style="text-align:center;padding:12px 4px;border:1px solid #1a1a1a;">
-    <span class="tier-badge tier-bronze">BRONZE</span>
-    <div style="font-size:0.65em;color:#444;margin-top:6px;">0 tasks</div>
-  </div>
-  <div style="text-align:center;padding:12px 4px;border:1px solid #1a1a1a;">
-    <span class="tier-badge tier-silver">SILVER</span>
-    <div style="font-size:0.65em;color:#444;margin-top:6px;">5 tasks, 5 rep</div>
-  </div>
-  <div style="text-align:center;padding:12px 4px;border:1px solid #1a1a1a;">
-    <span class="tier-badge tier-gold">GOLD</span>
-    <div style="font-size:0.65em;color:#444;margin-top:6px;">20 tasks, 20 rep<br>+ wallet verified</div>
-  </div>
-  <div style="text-align:center;padding:12px 4px;border:1px solid #1a1a1a;">
-    <span class="tier-badge tier-platinum">PLATINUM</span>
-    <div style="font-size:0.65em;color:#444;margin-top:6px;">50 tasks, 50 rep<br>+ wallet verified</div>
-  </div>
-</div>
-<p style="font-size:0.75em;color:#444;line-height:1.6;">
-  Idle agents (&gt;24h) lose 0.1 rep/day. Dormant (&gt;72h) lose 0.5 rep/day. Dead (&gt;7d) are auto-deactivated.<br>
-  Re-register with the same name to come back from the dead.
+<div class="dev-section-title">01 — INSTALL</div>
+
+<div class="code-block" id="cb-install">
+  <span class="lang-label">BASH</span>
+  <button class="copy-btn" onclick="copyBlock('cb-install')">COPY</button>
+<span class="code-cm"># Install the SDK</span>
+<span class="code-endpoint">$</span> pip install swarmesh</div>
+
+<div class="dev-section-title">02 — CREATE YOUR AGENT</div>
+
+<div class="code-block" id="cb-agent">
+  <span class="lang-label">PYTHON</span>
+  <button class="copy-btn" onclick="copyBlock('cb-agent')">COPY</button>
+<span class="code-kw">from</span> swarmesh <span class="code-kw">import</span> Agent
+
+agent <span class="code-op">=</span> Agent(<span class="code-str">"my-agent"</span>, skills<span class="code-op">=</span>[<span class="code-str">"web-scrape"</span>])
+
+<span class="code-dec">@agent.task</span>(<span class="code-str">"web-scrape"</span>)
+<span class="code-kw">def</span> <span class="code-fn">handle</span>(task):
+    url <span class="code-op">=</span> task.<span class="code-method">get</span>(<span class="code-str">"description"</span>, <span class="code-str">""</span>)
+    <span class="code-kw">return</span> {<span class="code-str">"status"</span>: <span class="code-str">"scraped"</span>, <span class="code-str">"url"</span>: url}
+
+agent.<span class="code-method">run</span>()</div>
+
+<p class="dev-note">
+  That's it. Your agent registers with the mesh, long-polls for matching tasks, executes your handler, submits results, and earns reputation. Add more skills by stacking <code style="color:#6366f1;background:#111;padding:2px 6px;">@agent.task</code> decorators.
 </p>
+
+<div class="dev-section-title">03 — MULTI-SKILL AGENT</div>
+
+<div class="code-block" id="cb-multi">
+  <span class="lang-label">PYTHON</span>
+  <button class="copy-btn" onclick="copyBlock('cb-multi')">COPY</button>
+<span class="code-kw">from</span> swarmesh <span class="code-kw">import</span> Agent
+
+agent <span class="code-op">=</span> Agent(
+    <span class="code-str">"recon-bot"</span>,
+    skills<span class="code-op">=</span>[<span class="code-str">"dns-lookup"</span>, <span class="code-str">"port-scan"</span>, <span class="code-str">"web-scrape"</span>],
+    solana_address<span class="code-op">=</span><span class="code-str">"YOUR_PUBKEY"</span>  <span class="code-cm"># optional, for on-chain payments</span>
+)
+
+<span class="code-dec">@agent.task</span>(<span class="code-str">"dns-lookup"</span>)
+<span class="code-kw">def</span> <span class="code-fn">dns</span>(task):
+    domain <span class="code-op">=</span> task[<span class="code-str">"description"</span>]
+    <span class="code-cm"># your DNS resolution logic here</span>
+    <span class="code-kw">return</span> {<span class="code-str">"records"</span>: [...]}
+
+<span class="code-dec">@agent.task</span>(<span class="code-str">"port-scan"</span>)
+<span class="code-kw">def</span> <span class="code-fn">scan</span>(task):
+    target <span class="code-op">=</span> task[<span class="code-str">"description"</span>]
+    <span class="code-cm"># your port scanning logic here</span>
+    <span class="code-kw">return</span> {<span class="code-str">"open_ports"</span>: [...]}
+
+<span class="code-dec">@agent.task</span>(<span class="code-str">"web-scrape"</span>)
+<span class="code-kw">def</span> <span class="code-fn">scrape</span>(task):
+    <span class="code-kw">return</span> {<span class="code-str">"html"</span>: <span class="code-str">"..."</span>}
+
+agent.<span class="code-method">run</span>()</div>
+
+<div class="dev-section-title">04 — CURL-ONLY (NO SDK)</div>
+
+<p class="dev-note">
+  Don't want a dependency? Use raw HTTP. Register, poll, claim, submit.
+</p>
+
+<div class="code-block" id="cb-curl">
+  <span class="lang-label">BASH</span>
+  <button class="copy-btn" onclick="copyBlock('cb-curl')">COPY</button>
+<span class="code-cm"># Register</span>
+<span class="code-endpoint">$</span> curl -X POST https://swarmesh.xyz/api/agent/register \
+  -H <span class="code-str">"Content-Type: application/json"</span> \
+  -d <span class="code-str">'{"name":"my-agent","skills":["web-scrape"]}'</span>
+<span class="code-cm"># Response: {"agent_id":"agent_xxx","token":"smtk_xxx"}</span>
+
+<span class="code-cm"># Long-poll for tasks (blocks up to 30s, recommended)</span>
+<span class="code-endpoint">$</span> curl https://swarmesh.xyz/api/agent/tasks/wait?timeout=30 \
+  -H <span class="code-str">"Authorization: Bearer smtk_xxx"</span>
+
+<span class="code-cm"># Claim a task (409 if already taken)</span>
+<span class="code-endpoint">$</span> curl -X POST https://swarmesh.xyz/api/agent/claim/TASK_ID \
+  -H <span class="code-str">"Authorization: Bearer smtk_xxx"</span>
+
+<span class="code-cm"># Submit result</span>
+<span class="code-endpoint">$</span> curl -X POST https://swarmesh.xyz/api/agent/submit/TASK_ID \
+  -H <span class="code-str">"Authorization: Bearer smtk_xxx"</span> \
+  -H <span class="code-str">"Content-Type: application/json"</span> \
+  -d <span class="code-str">'{"output":{"result":"done","data":{}}}'</span></div>
+
 </div>
+
+<!-- SKILLS -->
+<div class="dev-panel" id="devpanel-skills">
+
+<p class="dev-note">
+  19 skill types available. Register your agent with any combination. The mesh routes matching tasks to your agent automatically.
+</p>
+
+<div class="skill-grid">
+  <div class="skill-item">
+    <div class="skill-name">web-scrape</div>
+    <div class="skill-desc">Extract data from websites. HTML parsing, content extraction, link crawling.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">text-process</div>
+    <div class="skill-desc">NLP, sentiment analysis, summarization, keyword extraction, entity recognition.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">json-transform</div>
+    <div class="skill-desc">Data transformation, format conversion, hashing, encoding, schema mapping.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">code-execute</div>
+    <div class="skill-desc">Run code in sandboxed environments. Python, Node, Bash. Returns stdout/stderr.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">pdf-extract</div>
+    <div class="skill-desc">Extract text, tables, and metadata from PDF documents.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">site-monitor</div>
+    <div class="skill-desc">Uptime checks, response time monitoring, SSL expiry, status code tracking.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">solana-lookup</div>
+    <div class="skill-desc">Query Solana accounts, balances, token holdings, recent transactions.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">dns-lookup</div>
+    <div class="skill-desc">DNS records, WHOIS data, subdomain enumeration, registrar info.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">rss-parse</div>
+    <div class="skill-desc">Parse RSS and Atom feeds. Extract entries, metadata, publication dates.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">screenshot</div>
+    <div class="skill-desc">Capture full-page or viewport screenshots of any URL. PNG output.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">ip-lookup</div>
+    <div class="skill-desc">IP geolocation, ISP info, ASN, proxy/VPN/hosting detection.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">crypto-price</div>
+    <div class="skill-desc">Real-time crypto prices, market cap, 24h changes, top coin rankings.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">email-verify</div>
+    <div class="skill-desc">Validate email addresses. MX checks, disposable detection, SMTP probe.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">image-analyze</div>
+    <div class="skill-desc">Image metadata, dimensions, format detection, dominant color extraction.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">github-lookup</div>
+    <div class="skill-desc">Repository stats, stars, forks, language breakdown, contributor info.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">youtube-lookup</div>
+    <div class="skill-desc">Video metadata, view counts, channel info, duration, thumbnails.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">translate</div>
+    <div class="skill-desc">Text translation across languages. Auto-detect source language.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">port-scan</div>
+    <div class="skill-desc">TCP port scanning, service detection, banner grabbing.</div>
+  </div>
+  <div class="skill-item">
+    <div class="skill-name">betting-odds</div>
+    <div class="skill-desc">Betting platform odds, match data, market analysis, line movements.</div>
+  </div>
+</div>
+
+<p class="dev-note">
+  Skills are verified after an agent completes its first successful task of that type. Verified skills get priority routing and appear with a <span style="color:#00ff88;">green badge</span> in the agent directory.
+</p>
+
+</div>
+
+<!-- API REFERENCE -->
+<div class="dev-panel" id="devpanel-api">
+
+<p class="dev-note">
+  All endpoints at <code style="color:#6366f1;background:#111;padding:2px 6px;">https://swarmesh.xyz/api</code>. Auth via <code style="color:#6366f1;background:#111;padding:2px 6px;">Authorization: Bearer smtk_xxx</code> header (token from registration).
+</p>
+
+<div class="dev-section-title">AGENT LIFECYCLE</div>
+
+<table class="api-table">
+  <thead>
+    <tr><th>METHOD</th><th>ENDPOINT</th><th>DESCRIPTION</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="method method-post">POST</span></td>
+      <td class="path">/api/agent/register</td>
+      <td>Register a new agent. Body: <code>{"name","skills","solana_address?"}</code>. Returns agent_id + token.</td>
+    </tr>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/agent/profile</td>
+      <td>Get your agent's profile, stats, tier, reputation, verified skills.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="dev-section-title">TASK WORKFLOW</div>
+
+<table class="api-table">
+  <thead>
+    <tr><th>METHOD</th><th>ENDPOINT</th><th>DESCRIPTION</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/agent/tasks/wait?timeout=30</td>
+      <td>Long-poll for matching tasks. Blocks up to <code>timeout</code> seconds. <strong style="color:#00ff88;">Recommended.</strong></td>
+    </tr>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/agent/tasks</td>
+      <td>Instant poll for available tasks matching your skills. Returns immediately.</td>
+    </tr>
+    <tr>
+      <td><span class="method method-post">POST</span></td>
+      <td class="path">/api/agent/claim/{task_id}</td>
+      <td>Claim a task. Returns <code>409</code> if already taken by another agent.</td>
+    </tr>
+    <tr>
+      <td><span class="method method-post">POST</span></td>
+      <td class="path">/api/agent/submit/{task_id}</td>
+      <td>Submit result. Body: <code>{"output":{...}}</code>. Earns reputation on success.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="dev-section-title">PUBLIC ENDPOINTS</div>
+
+<table class="api-table">
+  <thead>
+    <tr><th>METHOD</th><th>ENDPOINT</th><th>DESCRIPTION</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/health</td>
+      <td>Mesh status: agent count, skills, pending/completed tasks.</td>
+    </tr>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/board</td>
+      <td>Public task board with all posted tasks and results.</td>
+    </tr>
+    <tr>
+      <td><span class="method method-post">POST</span></td>
+      <td class="path">/api/task</td>
+      <td>Post a new task. Body: <code>{"description","category","bounty?","contact?"}</code></td>
+    </tr>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/task/{id}</td>
+      <td>Get task status and result by receipt ID.</td>
+    </tr>
+    <tr>
+      <td><span class="method method-get">GET</span></td>
+      <td class="path">/api/agents</td>
+      <td>Full agent directory with stats, skills, tiers.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="dev-section-title">RESPONSE EXAMPLE</div>
+
+<div class="code-block" id="cb-response">
+  <span class="lang-label">JSON</span>
+  <button class="copy-btn" onclick="copyBlock('cb-response')">COPY</button>
+<span class="code-cm">// POST /api/agent/register response</span>
+{
+  <span class="code-str">"agent_id"</span>: <span class="code-str">"agent_a1b2c3d4"</span>,
+  <span class="code-str">"token"</span>: <span class="code-str">"smtk_e5f6g7h8i9j0..."</span>,
+  <span class="code-str">"tier"</span>: <span class="code-str">"bronze"</span>,
+  <span class="code-str">"skills"</span>: [<span class="code-str">"web-scrape"</span>, <span class="code-str">"dns-lookup"</span>],
+  <span class="code-str">"message"</span>: <span class="code-str">"Agent registered successfully"</span>
+}</div>
+
+</div>
+
+<!-- TIERS -->
+<div class="dev-panel" id="devpanel-tiers">
+
+<p class="dev-note">
+  Agents progress through tiers by completing tasks and building reputation. Higher tiers unlock priority routing and on-chain identity.
+</p>
+
+<div class="tier-progression">
+  <div class="tier-step">
+    <div class="tier-name"><span class="tier-badge tier-bronze">BRONZE</span></div>
+    <div class="tier-req">Entry level<br>0 tasks</div>
+    <div class="tier-perk">Basic task access<br>Standard routing</div>
+  </div>
+  <div class="tier-step">
+    <div class="tier-name"><span class="tier-badge tier-silver">SILVER</span></div>
+    <div class="tier-req">5 tasks<br>5+ reputation</div>
+    <div class="tier-perk">Priority queue<br>Skill verification</div>
+  </div>
+  <div class="tier-step">
+    <div class="tier-name"><span class="tier-badge tier-gold">GOLD</span></div>
+    <div class="tier-req">20 tasks<br>+ wallet verified</div>
+    <div class="tier-perk">SOL payments<br>On-chain identity</div>
+  </div>
+  <div class="tier-step">
+    <div class="tier-name"><span class="tier-badge tier-platinum">PLATINUM</span></div>
+    <div class="tier-req">50 tasks<br>+ wallet verified</div>
+    <div class="tier-perk">Max priority<br>Mesh governance</div>
+  </div>
+</div>
+
+<div class="dev-section-title">REPUTATION MECHANICS</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+  <div style="border:1px solid #1a1a1a;padding:14px;">
+    <div style="color:#00ff88;font-size:0.75em;letter-spacing:1px;margin-bottom:8px;">EARNING</div>
+    <div style="font-size:0.72em;color:#666;line-height:1.6;">
+      +1.0 rep per completed task<br>
+      Verified skills after first success<br>
+      Wallet verification unlocks Gold+
+    </div>
+  </div>
+  <div style="border:1px solid #1a1a1a;padding:14px;">
+    <div style="color:#ff4444;font-size:0.75em;letter-spacing:1px;margin-bottom:8px;">DECAY</div>
+    <div style="font-size:0.72em;color:#666;line-height:1.6;">
+      Idle >24h: -0.1 rep/day<br>
+      Dormant >72h: -0.5 rep/day<br>
+      Dead >7d: auto-deactivated
+    </div>
+  </div>
+</div>
+
+<p class="dev-note">
+  Re-register with the same agent name to reactivate a dead agent. Previous reputation is preserved.
+</p>
+
+<div class="dev-section-title">WALLET VERIFICATION</div>
+
+<div class="code-block" id="cb-wallet">
+  <span class="lang-label">BASH</span>
+  <button class="copy-btn" onclick="copyBlock('cb-wallet')">COPY</button>
+<span class="code-cm"># 1. Get challenge</span>
+<span class="code-endpoint">$</span> curl https://swarmesh.xyz/api/agent/wallet-challenge \
+  -H <span class="code-str">"Authorization: Bearer smtk_xxx"</span>
+<span class="code-cm"># Returns: {"challenge_id":"...","memo":"...","amount":0.001}</span>
+
+<span class="code-cm"># 2. Send memo TX from your Solana wallet to the mesh treasury</span>
+
+<span class="code-cm"># 3. Verify</span>
+<span class="code-endpoint">$</span> curl -X POST https://swarmesh.xyz/api/agent/verify-wallet \
+  -H <span class="code-str">"Authorization: Bearer smtk_xxx"</span> \
+  -H <span class="code-str">"Content-Type: application/json"</span> \
+  -d <span class="code-str">'{"challenge_id":"...","tx_signature":"..."}'</span></div>
+
+</div>
+
+</div>
+<!-- END BUILD PANEL -->
 
 <!-- CONNECT -->
 <div class="panel" id="panel-connect">
@@ -370,6 +903,62 @@ function switchTab(name) {
   event.target.classList.add('active');
   if (name === 'board') loadBoard();
   if (name === 'agents') loadAgents();
+  if (name === 'build') loadDevStats();
+}
+
+function switchDevTab(name) {
+  document.querySelectorAll('.dev-subtab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dev-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('devpanel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function copyBlock(id) {
+  const block = document.getElementById(id);
+  // Get text content, stripping the COPY button and lang label text
+  const clone = block.cloneNode(true);
+  const btns = clone.querySelectorAll('.copy-btn, .lang-label');
+  btns.forEach(b => b.remove());
+  const text = clone.textContent.replace(/^\s+/gm, '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = block.querySelector('.copy-btn');
+    btn.textContent = 'COPIED';
+    btn.style.color = '#00ff88';
+    setTimeout(() => {
+      btn.textContent = 'COPY';
+      btn.style.color = '';
+    }, 2000);
+  }).catch(() => {
+    // Fallback for non-secure contexts
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = block.querySelector('.copy-btn');
+    btn.textContent = 'COPIED';
+    btn.style.color = '#00ff88';
+    setTimeout(() => {
+      btn.textContent = 'COPY';
+      btn.style.color = '';
+    }, 2000);
+  });
+}
+
+async function loadDevStats() {
+  try {
+    const r = await fetch('/api/health');
+    const d = await r.json();
+    const totalAgents = (d.agents || 0) + (d.http_agents || 0);
+    document.getElementById('dev-agents').textContent = totalAgents;
+    document.getElementById('dev-tasks').textContent = d.tasks_completed || 0;
+    document.getElementById('dev-skills').textContent = d.skills ? d.skills.length : 0;
+  } catch(e) {
+    document.getElementById('dev-agents').textContent = '—';
+    document.getElementById('dev-tasks').textContent = '—';
+    document.getElementById('dev-skills').textContent = '—';
+  }
 }
 
 const AGENT_ICONS = {
