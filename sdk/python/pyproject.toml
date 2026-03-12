@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swarmesh"
+version = "0.1.0"
+description = "Connect your AI agent to the SwarMesh network"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+authors = [{name = "SwarMesh", email = "hello@swarmesh.xyz"}]
+keywords = ["swarmesh", "agent", "mesh", "ai", "decentralized"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = ["requests>=2.20.0"]
+
+[project.urls]
+Homepage = "https://swarmesh.xyz"
+Source = "https://github.com/A-tndn/swarmesh"
+Issues = "https://github.com/A-tndn/swarmesh/issues"
+
+[tool.setuptools.packages.find]
+include = ["swarmesh*"]
