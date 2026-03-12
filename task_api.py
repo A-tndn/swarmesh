@@ -351,12 +351,35 @@ async def _tier_decay_loop():
                 "UPDATE submissions SET status='expired' WHERE status IN ('pending','posted') AND created_at < ?",
                 (stale_cutoff,)
             ).rowcount
-            # Clear orphan queue items
-            orphans = conn.execute("DELETE FROM agent_task_queue WHERE claimed=0").rowcount
+            # Clear old orphan queue items (>2 hours old)
+            orphan_cutoff = (_dt.datetime.utcnow() - _dt.timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
+            orphans = conn.execute("DELETE FROM agent_task_queue WHERE claimed=0 AND created_at < ?", (orphan_cutoff,)).rowcount
             if expired > 0 or orphans > 0:
                 logger.info("Self-heal: expired %d stale tasks, cleared %d orphan queue items", expired, orphans)
             conn.commit()
             conn.close()
+
+            # --- Retry stuck pending submissions (no mesh_task_id) ---
+            try:
+                retry_conn = get_db()
+                stuck = retry_conn.execute(
+                    "SELECT id, description, category, bounty FROM submissions "
+                    "WHERE status='pending' AND (mesh_task_id IS NULL OR mesh_task_id='') "
+                    "AND created_at > ? LIMIT 5",
+                    (stale_cutoff,)
+                ).fetchall()
+                retry_conn.close()
+                if stuck:
+                    logger.info("Retrying %d stuck submissions...", len(stuck))
+                    for row in stuck:
+                        try:
+                            mid = await bridge.post_task(row["id"], row["description"], row["category"], row["bounty"] or "")
+                            if mid:
+                                logger.info("Retry success: submission #%d -> %s", row["id"], mid)
+                        except Exception as retry_err:
+                            logger.debug("Retry failed for #%d: %s", row["id"], retry_err)
+            except Exception as retry_loop_err:
+                logger.debug("Retry loop error: %s", retry_loop_err)
         except asyncio.CancelledError:
             logger.info("Tier decay loop cancelled")
             break
@@ -659,10 +682,6 @@ class MeshBridge:
             await self._ws.send_str(submit_msg)
 
     async def post_task(self, submission_id: int, description: str, category: str, bounty: str) -> str:
-        if not self._connected:
-            await self.connect()
-        if not self._connected:
-            return ""
         mesh_task_id = str(uuid.uuid4())[:12]
         skill = CATEGORY_SKILL_MAP.get(category, "text-process")
         bounty_lamports = 0
@@ -681,21 +700,29 @@ class MeshBridge:
             "bounty_lamports": bounty_lamports,
             "status": "open",
         }
-        task_msg = json.dumps({
-            "type": "task_post",
-            "sender": "swarmesh_bridge",
-            "payload": {"task": task_data},
-            "msg_id": f"post_{int(time.time())}",
-            "timestamp": time.time(),
-            "target": None,
-        })
-        await self._ws.send_str(task_msg)
+        # Try WS broadcast (optional — HTTP agents are primary)
+        if not self._connected:
+            await self.connect()
+        if self._connected:
+            try:
+                task_msg = json.dumps({
+                    "type": "task_post",
+                    "sender": "swarmesh_bridge",
+                    "payload": {"task": task_data},
+                    "msg_id": f"post_{int(time.time())}",
+                    "timestamp": time.time(),
+                    "target": None,
+                })
+                await self._ws.send_str(task_msg)
+            except Exception as ws_err:
+                logger.warning("WS broadcast failed: %s", ws_err)
         self._pending_results[mesh_task_id] = submission_id
         conn = get_db()
         conn.execute("UPDATE submissions SET mesh_task_id=?, status='posted' WHERE id=?",
                       (mesh_task_id, submission_id))
         conn.commit()
         conn.close()
+        # Always fanout to HTTP agents (even if WS is down)
         await self._fanout_to_http_agents(task_data)
         logger.info("Submission #%d -> mesh task %s (skill=%s)", submission_id, mesh_task_id, skill)
         return mesh_task_id
